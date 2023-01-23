@@ -24,21 +24,21 @@ import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.service.ISysPostService;
 
 /**
- * 岗位信息操作处理
+ * 职位信息操作处理
  * 
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/post")
+@RequestMapping("/base/post")
 public class SysPostController extends BaseController
 {
     @Autowired
     private ISysPostService postService;
 
     /**
-     * 获取岗位列表
+     * 获取职位列表
      */
-    @PreAuthorize("@ss.hasPermi('system:post:list')")
+    @PreAuthorize("@ss.hasPermi('base:post:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysPost post)
     {
@@ -47,20 +47,20 @@ public class SysPostController extends BaseController
         return getDataTable(list);
     }
     
-    @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:post:export')")
+    @Log(title = "职位管理", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('base:post:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysPost post)
     {
         List<SysPost> list = postService.selectPostList(post);
         ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
-        util.exportExcel(response, list, "岗位数据");
+        util.exportExcel(response, list, "职位数据");
     }
 
     /**
-     * 根据岗位编号获取详细信息
+     * 根据职位编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:post:query')")
+    @PreAuthorize("@ss.hasPermi('base:post:query')")
     @GetMapping(value = "/{postId}")
     public AjaxResult getInfo(@PathVariable Long postId)
     {
@@ -68,50 +68,50 @@ public class SysPostController extends BaseController
     }
 
     /**
-     * 新增岗位
+     * 新增职位
      */
-    @PreAuthorize("@ss.hasPermi('system:post:add')")
-    @Log(title = "岗位管理", businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('base:post:add')")
+    @Log(title = "职位管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysPost post)
     {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
         {
-            return error("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            return error("新增职位'" + post.getPostName() + "'失败，职位名称已存在");
         }
         else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post)))
         {
-            return error("新增岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+            return error("新增职位'" + post.getPostName() + "'失败，职位编码已存在");
         }
         post.setCreateBy(getUsername());
         return toAjax(postService.insertPost(post));
     }
 
     /**
-     * 修改岗位
+     * 修改职位
      */
-    @PreAuthorize("@ss.hasPermi('system:post:edit')")
-    @Log(title = "岗位管理", businessType = BusinessType.UPDATE)
+    @PreAuthorize("@ss.hasPermi('base:post:edit')")
+    @Log(title = "职位管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysPost post)
     {
         if (UserConstants.NOT_UNIQUE.equals(postService.checkPostNameUnique(post)))
         {
-            return error("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            return error("修改职位'" + post.getPostName() + "'失败，职位名称已存在");
         }
         else if (UserConstants.NOT_UNIQUE.equals(postService.checkPostCodeUnique(post)))
         {
-            return error("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+            return error("修改职位'" + post.getPostName() + "'失败，职位编码已存在");
         }
         post.setUpdateBy(getUsername());
         return toAjax(postService.updatePost(post));
     }
 
     /**
-     * 删除岗位
+     * 删除职位
      */
-    @PreAuthorize("@ss.hasPermi('system:post:remove')")
-    @Log(title = "岗位管理", businessType = BusinessType.DELETE)
+    @PreAuthorize("@ss.hasPermi('base:post:remove')")
+    @Log(title = "职位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
     public AjaxResult remove(@PathVariable Long[] postIds)
     {
@@ -119,7 +119,7 @@ public class SysPostController extends BaseController
     }
 
     /**
-     * 获取岗位选择框列表
+     * 获取职位选择框列表
      */
     @GetMapping("/optionselect")
     public AjaxResult optionselect()
