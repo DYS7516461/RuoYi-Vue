@@ -82,7 +82,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'profile',
-        component: () => import('@/views/system/user/profile/index'),
+        component: () => import('@/views/base/user/profile/index'),
         name: 'Profile',
         meta: { title: '个人中心', icon: 'user' }
       }
@@ -100,7 +100,7 @@ export const dynamicRoutes = [
     children: [
       {
         path: 'role/:userId(\\d+)',
-        component: () => import('@/views/system/user/authRole'),
+        component: () => import('@/views/base/user/authRole'),
         name: 'AuthRole',
         meta: { title: '分配角色', activeMenu: '/system/user' }
       }
