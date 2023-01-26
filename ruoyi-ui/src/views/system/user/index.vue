@@ -407,6 +407,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        userType: this.$route.query.userType !== undefined ? this.$route.query.userType : undefined,
         userName: undefined,
         phonenumber: undefined,
         status: undefined,
