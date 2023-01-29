@@ -520,6 +520,7 @@ export default {
         phonenumber: undefined,
         email: undefined,
         sex: undefined,
+        userType: this.$route.query.userType !== undefined ? this.$route.query.userType : '00',
         status: "0",
         remark: undefined,
         postIds: [],
