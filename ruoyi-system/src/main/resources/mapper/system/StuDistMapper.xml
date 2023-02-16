@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StuDistMapper">
+
+    <resultMap id="stuDistResult" type="StuDist" >
+        <id column="id" property="id"  />
+        <result column="deptName" property="deptName"  />
+        <result column="studentId" property="studentId"  />
+        <result column="studentName" property="studentName"  />
+        <result column="teacherId" property="teacherId"  />
+        <result column="teacherName" property="teacherName"  />
+    </resultMap>
+
+    <resultMap id="deptResult" type="SysDept">
+        <id     property="deptId"    column="dept_id"     />
+        <result property="parentId"  column="parent_id"   />
+        <result property="deptName"  column="dept_name"   />
+        <result property="ancestors" column="ancestors"   />
+        <result property="orderNum"  column="order_num"   />
+        <result property="leader"    column="leader"      />
+        <result property="status"    column="dept_status" />
+    </resultMap>
+
+    <sql id="selectDistVo">
+        select su.user_id as studentId,su.user_name as studentName,sd.teacherId,teac.user_name as teacherName,dept.dept_name from sys_user su
+            LEFT JOIN studist sd ON sd.studentId = su.user_id
+            LEFT JOIN sys_user teac ON teac.user_id = sd.teacherId
+            LEFT JOIN sys_dept dept ON dept.dept_id = su.dept_id
+        where su.user_type = '01'
+    </sql>
+
+    <select id="selectDistList" parameterType="StuDist" resultMap="stuDistResult">
+        <include refid="selectDistVo"/>
+        <if test="studentId != null and studentId != 0">
+            AND sd.studentId = #{studentId}
+        </if>
+        <if test="studentName != null and studentName != ''">
+            AND stu.studentName like concat('%', #{studentName}, '%')
+        </if>
+        <if test="teacherId != null and teacherId != 0">
+            AND sd.teacherId = #{teacherId}
+        </if>
+        <if test="studentName != null and studentName != ''">
+            AND teac.studentName like concat('%', #{studentName}, '%')
+        </if>
+        <if test="deptId != null and deptId != 0">
+            AND (dept.dept_id = #{deptId} OR dept.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+
+    <insert id="insertDist" parameterType="StuDist" useGeneratedKeys="true" keyProperty="id">
+        insert into studist(
+        <if test="studentId != null and studentId != 0">studentId,</if>
+        <if test="teacherId != null and deptId != 0">teacherId</if>
+        )values(
+        <if test="studentId != null and studentId != ''">#{studentId},</if>
+        <if test="teacherId != null and teacherId != ''">#{teacherId}</if>
+        )
+    </insert>
+
+    <update id="updateDist" parameterType="StuDist">
+        update studist set teacherId = #{teacherId} where studentId in
+        <foreach collection="array" item="studentId" open="(" separator="," close=")">
+            #{studentId}
+        </foreach>
+    </update>
+
+    <delete id="deleteDistByIds" parameterType="Long">
+        update studist set teacherId = null where studist.studentId in
+        <foreach collection="array" item="studentId" open="(" separator="," close=")">
+            #{studentId}
+        </foreach>
+    </delete>
+
+</mapper>
