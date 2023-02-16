@@ -90,7 +90,7 @@
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+        <el-table v-loading="loading" :data="studentList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="部门" align="center" key="deptName" prop="dept.deptName" v-if="columns[0].visible" :show-overflow-tooltip="true" />
           <el-table-column label="学生编号" align="center" key="studentId" prop="studentId" v-if="columns[1].visible" />
@@ -147,7 +147,7 @@ export default {
       // 总条数
       total: 0,
       // 用户表格数据
-      userList: null,
+      studentList: null,
       // 弹出层标题
       title: "",
       // 部门树选项
@@ -166,11 +166,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        studentId: undefined,
         studentName: undefined,
-        teacherID: undefined,
-        teacherName: undefined,
-        deptId: undefined
+        teacherName: undefined
       },
       // 列信息
       columns: [
@@ -232,7 +229,7 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        userId: undefined,
+        studentId: undefined,
         deptId: undefined,
         userName: undefined,
         nickName: undefined,
@@ -263,7 +260,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.userId);
+      this.ids = selection.map(item => item.studentId);
       this.single = selection.length !== 1;
       this.multiple = !selection.length;
     },
@@ -274,22 +271,22 @@ export default {
         this.postOptions = response.posts;
         this.roleOptions = response.roles;
         this.open = true;
-        this.title = "添加用户";
+        this.title = "分配指导老师";
         this.form.password = this.initPassword;
       });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const userId = row.userId || this.ids;
-      getUser(userId).then(response => {
+      const studentId = row.studentId || this.ids;
+      getUser(studentId).then(response => {
         this.form = response.data;
         this.postOptions = response.posts;
         this.roleOptions = response.roles;
         this.$set(this.form, "postIds", response.postIds);
         this.$set(this.form, "roleIds", response.roleIds);
         this.open = true;
-        this.title = "修改用户";
+        this.title = "修改指导老师";
         this.form.password = "";
       });
     },
@@ -297,7 +294,7 @@ export default {
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.userId != undefined) {
+          if (this.form.studentId != undefined) {
             updateUser(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
@@ -305,7 +302,7 @@ export default {
             });
           } else {
             addUser(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
+              this.$modal.msgSuccess("分配成功");
               this.open = false;
               this.getList();
             });
@@ -315,9 +312,9 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const userIds = row.userId || this.ids;
-      this.$modal.confirm('是否确认删除用户编号为"' + userIds + '"的数据项？').then(function() {
-        return delUser(userIds);
+      const studentIds = row.studentId || this.ids;
+      this.$modal.confirm('是否确认删除用户编号为"' + studentIds + '"的数据项？').then(function() {
+        return delUser(studentIds);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");

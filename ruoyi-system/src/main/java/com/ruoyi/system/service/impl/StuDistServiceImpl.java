@@ -6,13 +6,16 @@ import com.ruoyi.system.service.IStuDistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
+@Service
 public class StuDistServiceImpl implements IStuDistService {
     private static final Logger log = LoggerFactory.getLogger(StuDistServiceImpl.class);
 
-    @Autowired
+    @Resource
     private StuDistMapper distMapper;
 
     @Override

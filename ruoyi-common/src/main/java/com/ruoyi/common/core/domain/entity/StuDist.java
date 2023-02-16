@@ -7,25 +7,29 @@ public class StuDist extends BaseEntity {
 
     private Long id;
 
-    private SysDept dept;
+    private Long deptId;
+
+    private String deptName;
 
     private Long studentId;
 
-    private SysUser student;
+    private String studentName;
 
     private Long teacherId;
 
-    private SysUser teacher;
+    private String teacherName;
 
     public StuDist() {
     }
 
-    public StuDist(Long id, Long studentId, SysUser student, Long teacherId, SysUser teacher) {
+    public StuDist(Long id, Long deptId, String deptName, Long studentId, String studentName, Long teacherId, String teacherName) {
         this.id = id;
+        this.deptId = deptId;
+        this.deptName = deptName;
         this.studentId = studentId;
-        this.student = student;
+        this.studentName = studentName;
         this.teacherId = teacherId;
-        this.teacher = teacher;
+        this.teacherName = teacherName;
     }
 
     public Long getId() {
@@ -36,12 +40,20 @@ public class StuDist extends BaseEntity {
         this.id = id;
     }
 
-    public SysDept getDept() {
-        return dept;
+    public Long getDeptId() {
+        return deptId;
     }
 
-    public void setDept(SysDept dept) {
-        this.dept = dept;
+    public void setDeptId(Long deptId) {
+        this.deptId = deptId;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
     }
 
     public Long getStudentId() {
@@ -52,12 +64,12 @@ public class StuDist extends BaseEntity {
         this.studentId = studentId;
     }
 
-    public SysUser getStudent() {
-        return student;
+    public String getStudentName() {
+        return studentName;
     }
 
-    public void setStudent(SysUser student) {
-        this.student = student;
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
     }
 
     public Long getTeacherId() {
@@ -68,12 +80,12 @@ public class StuDist extends BaseEntity {
         this.teacherId = teacherId;
     }
 
-    public SysUser getTeacher() {
-        return teacher;
+    public String getTeacherName() {
+        return teacherName;
     }
 
-    public void setTeacher(SysUser teacher) {
-        this.teacher = teacher;
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
     }
 
 
@@ -81,12 +93,12 @@ public class StuDist extends BaseEntity {
     public String toString() {
         return "StuDist{" +
                 "id=" + id +
-                ", dept=" + dept +
+                ", deptId=" + deptId +
+                ", deptName='" + deptName + '\'' +
                 ", studentId=" + studentId +
-                ", student=" + student +
+                ", studentName='" + studentName + '\'' +
                 ", teacherId=" + teacherId +
-                ", teacher=" + teacher +
+                ", teacherName='" + teacherName + '\'' +
                 '}';
     }
-
 }

@@ -24,7 +24,7 @@
     </resultMap>
 
     <sql id="selectDistVo">
-        select su.user_id as studentId,su.user_name as studentName,sd.teacherId,teac.user_name as teacherName,dept.dept_name from sys_user su
+        select su.user_id as studentId,su.user_name as studentName,sd.teacherId,teac.user_name as teacherName,dept.dept_name as deptName,su.dept_id as deptId from sys_user su
             LEFT JOIN studist sd ON sd.studentId = su.user_id
             LEFT JOIN sys_user teac ON teac.user_id = sd.teacherId
             LEFT JOIN sys_dept dept ON dept.dept_id = su.dept_id
