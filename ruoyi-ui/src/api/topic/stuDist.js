@@ -31,7 +31,7 @@ export function updateDist(data) {
 // 删除学生分配关系
 export function delDist(StudentId) {
   return request({
-    url: '/topic/dist' + StudentId,
+    url: '/topic/dist/' + StudentId,
     method: 'delete'
   })
 }

@@ -92,11 +92,12 @@
 
         <el-table v-loading="loading" :data="studentList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="部门" align="center" key="deptName" prop="dept.deptName" v-if="columns[0].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="学生编号" align="center" key="studentId" prop="studentId" v-if="columns[1].visible" />
-          <el-table-column label="学生名称" align="center" key="studentName" prop="studentName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="教师编号" align="center" key="teacherId" prop="teacherId" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="指导老师" align="center" key="teacherName" prop="teacherName" v-if="columns[4].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="ID" align="center" key="id" prop="id" v-if="columns[0].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="部门" align="center" key="deptName" prop="deptName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="学生编号" align="center" key="studentId" prop="studentId" v-if="columns[2].visible" :show-overflow-tooltip="true"/>
+          <el-table-column label="学生名称" align="center" key="studentName" prop="studentName" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="教师编号" align="center" key="teacherId" prop="teacherId" v-if="columns[4].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="指导老师" align="center" key="teacherName" prop="teacherName" v-if="columns[5].visible" :show-overflow-tooltip="true" />
         </el-table>
 
         <pagination
@@ -136,8 +137,10 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 选中数组
+      // 选中数组(id)
       ids: [],
+      // 选中数组(studentId)
+      studentIds: [],
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -171,11 +174,12 @@ export default {
       },
       // 列信息
       columns: [
-        { key: 0, label: `部门`, visible: true },
-        { key: 1, label: `学生编号`, visible: true },
-        { key: 2, label: `学生名称`, visible: true },
-        { key: 3, label: `教师编号`, visible: true },
-        { key: 4, label: `教师名称`, visible: true }
+        { key: 0, label: `ID`, visible: true },
+        { key: 1, label: `部门`, visible: true },
+        { key: 2, label: `学生编号`, visible: true },
+        { key: 3, label: `学生名称`, visible: true },
+        { key: 4, label: `教师编号`, visible: true },
+        { key: 5, label: `教师名称`, visible: true }
       ],
       // 表单校验
       rules: {
@@ -197,8 +201,8 @@ export default {
     /** 查询用户列表 */
     getList() {
       this.loading = true;
-      listDist(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-          this.userList = response.rows;
+      listDist(this.queryParams).then(response => {
+          this.studentList = response.rows;
           this.total = response.total;
           this.loading = false;
         }
@@ -226,25 +230,6 @@ export default {
       this.open = false;
       this.reset();
     },
-    // 表单重置
-    reset() {
-      this.form = {
-        studentId: undefined,
-        deptId: undefined,
-        userName: undefined,
-        nickName: undefined,
-        password: undefined,
-        phonenumber: undefined,
-        email: undefined,
-        sex: undefined,
-        userType: this.$route.query.userType !== undefined ? this.$route.query.userType : '00',
-        status: "0",
-        remark: undefined,
-        postIds: [],
-        roleIds: []
-      };
-      this.resetForm("form");
-    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -260,7 +245,8 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.studentId);
+      this.ids = selection.map(item => item.id);
+      this.studentIds = selection.map(item => item.studentId);
       this.single = selection.length !== 1;
       this.multiple = !selection.length;
     },
@@ -312,9 +298,17 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const studentIds = row.studentId || this.ids;
-      this.$modal.confirm('是否确认删除用户编号为"' + studentIds + '"的数据项？').then(function() {
-        return delUser(studentIds);
+      let distIds = row.id || this.ids;
+      let ids = [];
+      for (let i = 0;i < distIds.length;i++){
+        if(distIds[i] != null) ids.push(distIds[i]);
+      }
+      distIds = ids;
+      const stuIds = row.studentId || this.studentIds;
+      console.log(distIds);
+      console.log(stuIds);
+      this.$modal.confirm('是否确认删除编号为"' + stuIds + '"的学生的指导老师？').then(function() {
+        return delDist(distIds);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");

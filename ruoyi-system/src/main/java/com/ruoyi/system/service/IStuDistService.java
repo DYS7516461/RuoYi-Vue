@@ -25,7 +25,7 @@ public interface IStuDistService {
      * @param dist 学生分配信息
      * @return 结果
      */
-    public int insertDist(StuDist dist);
+    public int insertDist(StuDist[] dists);
 
     /**
      * 修改学生分配

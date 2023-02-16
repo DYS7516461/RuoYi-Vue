@@ -24,7 +24,7 @@
     </resultMap>
 
     <sql id="selectDistVo">
-        select su.user_id as studentId,su.user_name as studentName,sd.teacherId,teac.user_name as teacherName,dept.dept_name as deptName,su.dept_id as deptId from sys_user su
+        select sd.id,su.user_id as studentId,su.user_name as studentName,sd.teacherId,teac.user_name as teacherName,dept.dept_name as deptName,su.dept_id as deptId from sys_user su
             LEFT JOIN studist sd ON sd.studentId = su.user_id
             LEFT JOIN sys_user teac ON teac.user_id = sd.teacherId
             LEFT JOIN sys_dept dept ON dept.dept_id = su.dept_id
@@ -33,17 +33,11 @@
 
     <select id="selectDistList" parameterType="StuDist" resultMap="stuDistResult">
         <include refid="selectDistVo"/>
-        <if test="studentId != null and studentId != 0">
-            AND sd.studentId = #{studentId}
-        </if>
         <if test="studentName != null and studentName != ''">
-            AND stu.studentName like concat('%', #{studentName}, '%')
+            AND su.user_name like concat('%', #{studentName}, '%')
         </if>
-        <if test="teacherId != null and teacherId != 0">
-            AND sd.teacherId = #{teacherId}
-        </if>
-        <if test="studentName != null and studentName != ''">
-            AND teac.studentName like concat('%', #{studentName}, '%')
+        <if test="teacherName != null and teacherName != ''">
+            AND teac.user_name like concat('%', #{teacherName}, '%')
         </if>
         <if test="deptId != null and deptId != 0">
             AND (dept.dept_id = #{deptId} OR dept.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
@@ -70,9 +64,9 @@
     </update>
 
     <delete id="deleteDistByIds" parameterType="Long">
-        update studist set teacherId = null where studist.studentId in
-        <foreach collection="array" item="studentId" open="(" separator="," close=")">
-            #{studentId}
+        delete from studist where studist.id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
         </foreach>
     </delete>
 

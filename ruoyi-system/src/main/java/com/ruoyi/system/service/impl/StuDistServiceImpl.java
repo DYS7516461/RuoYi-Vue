@@ -24,9 +24,13 @@ public class StuDistServiceImpl implements IStuDistService {
     }
 
     @Override
-    public int insertDist(StuDist dist) {
+    public int insertDist(StuDist[] dists) {
         //新增学生分配关系
-        return distMapper.insertDist(dist);
+        int i = 0;
+        for (StuDist dist : dists){
+            i += distMapper.insertDist(dist);
+        }
+        return i;
     }
 
     @Override

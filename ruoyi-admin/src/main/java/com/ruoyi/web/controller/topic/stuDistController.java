@@ -46,9 +46,9 @@ public class stuDistController extends BaseController {
     @PreAuthorize("@ss.hasPermi('topic:dist:add')")
     @Log(title = "学生分配", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@Validated @RequestBody StuDist dist)
+    public AjaxResult add(@Validated @RequestBody StuDist[] dists)
     {
-        return toAjax(distService.insertDist(dist));
+        return toAjax(distService.insertDist(dists));
     }
 
     /**
