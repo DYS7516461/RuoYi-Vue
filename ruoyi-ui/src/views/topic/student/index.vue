@@ -113,7 +113,13 @@
     <!-- 添加或修改用户配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-
+        <el-table v-loading="loading" :data="teacherList" @selection-change="handleSelectionChangeTeacher">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="ID" align="center" key="id" prop="id" v-if="columns[0].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="部门" align="center" key="deptName" prop="deptName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="教师编号" align="center" key="teacherId" prop="teacherId" v-if="columns[4].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="教师名称" align="center" key="teacherName" prop="teacherName" v-if="columns[5].visible" :show-overflow-tooltip="true" />
+        </el-table>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -126,6 +132,8 @@
 
 <script>
 import { listDist, addDist, updateDist, delDist, deptTreeSelect } from "@/api/topic/stuDist";
+import { listUser } from "@/api/system/user";
+import { listRole } from "@/api/system/role";
 import { getToken } from "@/utils/auth";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -151,6 +159,8 @@ export default {
       total: 0,
       // 用户表格数据
       studentList: null,
+      // 教师表格数据
+      teacherList: null,
       // 弹出层标题
       title: "",
       // 部门树选项
@@ -174,7 +184,7 @@ export default {
       },
       // 列信息
       columns: [
-        { key: 0, label: `ID`, visible: true },
+        { key: 0, label: `ID`, visible: false },
         { key: 1, label: `部门`, visible: true },
         { key: 2, label: `学生编号`, visible: true },
         { key: 3, label: `学生名称`, visible: true },
@@ -250,15 +260,49 @@ export default {
       this.single = selection.length !== 1;
       this.multiple = !selection.length;
     },
+    // 分配教师表单选择事件
+    handleSelectionChangeTeacher(selection) {
+      // this.teacherIds = selection.map(item => item.teacherId);
+    },
     /** 分配按钮操作 */
     handleAdd() {
+      // 判断所选学生是否已分配指导老师
+      let flag = false;     //默认未分配指导老师
+      // 判断是否选择学生
+      if (this.studentIds.length === 0) {
+        this.$message({
+          message: "请选择学生！",
+          type: "warning"
+        });
+        return;
+      }else{        //已选择学生，判断是否已分配指导老师
+        for (let i = 0; i < this.ids.length; i++) {
+          if (this.ids[i] !== null) {
+            flag = true;
+            break;
+          }
+        }
+        if (flag) {
+          this.$message({
+            message: "所选学生已分配指导老师！",
+            type: "warning"
+          });
+          return;
+        }
+
+      }
+
+      // 未分配指导老师，弹出分配指导老师窗口
       this.reset();
-      getUser().then(response => {
-        this.postOptions = response.posts;
-        this.roleOptions = response.roles;
+      listUser({
+        pageNum: 1,
+        pageSize: 10,
+        userType: '02'
+
+      }).then(response => {
+        this.teacherList = response.data;
         this.open = true;
         this.title = "分配指导老师";
-        this.form.password = this.initPassword;
       });
     },
     /** 修改按钮操作 */
