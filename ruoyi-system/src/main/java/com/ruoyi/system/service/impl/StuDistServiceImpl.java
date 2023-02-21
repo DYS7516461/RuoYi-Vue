@@ -35,7 +35,12 @@ public class StuDistServiceImpl implements IStuDistService {
 
     @Override
     public int updateDist(StuDist[] dists) {
-        return distMapper.updateDist(dists);
+        //更新学生分配关系
+        int i = 0;
+        for (StuDist dist : dists){
+            i += distMapper.updateDist(dist);
+        }
+        return i;
     }
 
     @Override

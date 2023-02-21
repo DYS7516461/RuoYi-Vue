@@ -111,19 +111,71 @@
     </el-row>
 
     <!-- 添加或修改用户配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-table v-loading="loading" :data="teacherList" @selection-change="handleSelectionChangeTeacher">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="ID" align="center" key="id" prop="id" v-if="columns[0].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="部门" align="center" key="deptName" prop="deptName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="教师编号" align="center" key="teacherId" prop="teacherId" v-if="columns[4].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="教师名称" align="center" key="teacherName" prop="teacherName" v-if="columns[5].visible" :show-overflow-tooltip="true" />
-        </el-table>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
+      <div>
+        <el-row>
+          <el-col  :span="6" :xs="24">
+            <div class="head-container">
+              <el-input
+                v-model="formDeptName"
+                placeholder="请输入部门名称"
+                clearable
+                size="small"
+                prefix-icon="el-icon-search"
+                style="margin-bottom: 20px"
+              />
+            </div>
+            <div class="head-container">
+              <el-tree
+                :data="formDeptOptions"
+                :props="defaultProps"
+                :expand-on-click-node="false"
+                :filter-node-method="filterNode"
+                ref="formTree"
+                node-key="id"
+                default-expand-all
+                highlight-current
+                @node-click="formHandleNodeClick"
+              />
+            </div>
+          </el-col>
+          <el-col  :span="18" :xs="24">
+            <el-form ref="formQueryForm" :model="form" :rules="rules" size="small" :inline="true" label-width="80px">
+              <el-form-item label="分组" prop="roleId">
+                <el-select @change="formRoleChange"
+                  v-model="formQueryParams.roleId"
+                  placeholder="分组"
+                  style="width: 240px"
+                >
+                  <el-option
+                    v-for="role in roleIdAndName"
+                    :key="role.roleId"
+                    :label="role.roleName"
+                    :value="role.roleId"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" size="mini" @click="handleTeacherSave">保存</el-button>
+              </el-form-item>
+            </el-form>
+            <el-table v-loading="loading" :data="teacherList" highlight-current-row @current-change="handleCurrentChangeTeacher" @row-dblclick="handleRowDblclickTeacher">
+              <el-table-column type="index" width="50" align="center" />
+              <el-table-column label="ID" align="center" key="id" prop="id" v-if="false" :show-overflow-tooltip="true" />
+              <el-table-column label="部门" align="center" key="dept.deptId" prop="dept.deptId" v-if="false" :show-overflow-tooltip="true" />
+              <el-table-column label="部门" align="center" key="dept.deptName" prop="dept.deptName" v-if="true" :show-overflow-tooltip="true" />
+              <el-table-column label="教师编号" align="center" key="userId" prop="userId" v-if="true" :show-overflow-tooltip="true" />
+              <el-table-column label="教师名称" align="center" key="nickName" prop="nickName" v-if="true" :show-overflow-tooltip="true" />
+            </el-table>
+            <pagination
+              v-show="formTotal>0"
+              :total="formTotal"
+              :page.sync="formQueryParams.pageNum"
+              :limit.sync="formQueryParams.pageSize"
+              @pagination="getTeacherList"
+            />
+          </el-col>
+        </el-row>
       </div>
     </el-dialog>
 
@@ -149,7 +201,7 @@ export default {
       ids: [],
       // 选中数组(studentId)
       studentIds: [],
-      // 非单个禁用
+      // 未选择禁用
       single: true,
       // 非多个禁用
       multiple: true,
@@ -157,18 +209,37 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
+      //弹出层表单-总条数
+      formTotal: 0,
+      //弹出层表单-选中教师id
+      formTeacherId: null,
       // 用户表格数据
       studentList: null,
       // 教师表格数据
       teacherList: null,
       // 弹出层标题
       title: "",
+      //弹出层角色下拉框
+      roleIdAndName: [],
+      //弹出层查询表单
+      formQueryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        userType: '02',
+        roleId: undefined
+      },
+      //弹出层表单-部门名称
+      formDeptName: undefined,
+      // 弹出层表单-部门树选项
+      formDeptOptions: undefined,
       // 部门树选项
       deptOptions: undefined,
       // 是否显示弹出层
       open: false,
       // 部门名称
       deptName: undefined,
+      //弹出层表单类型
+      formType: "", // add, edit
       // 表单参数
       form: {},
       defaultProps: {
@@ -201,6 +272,10 @@ export default {
     // 根据名称筛选部门树
     deptName(val) {
       this.$refs.tree.filter(val);
+    },
+    // 根据名称筛选部门树
+    formDeptName(val) {
+      this.$refs.formTree.filter(val);
     }
   },
   created() {
@@ -234,11 +309,27 @@ export default {
       this.queryParams.deptId = data.id;
       this.handleQuery();
     },
+    /** 弹出表单-查询部门下拉树结构 */
+    getFormDeptTree() {
+      deptTreeSelect().then(response => {
+        this.formDeptOptions = response.data;
+      });
+    },
+    // 弹出表单-节点单击事件
+    formHandleNodeClick(data) {
+      this.formQueryParams.deptId = data.id;
+      this.formHandleQuery();
+    },
+    /** 弹出表单-搜索按钮操作 */
+    formHandleQuery() {
+      this.formQueryParams.pageNum = 1;
+      this.getTeacherList();
+    },
 
     // 取消按钮
     cancel() {
       this.open = false;
-      this.reset();
+      // this.reset();
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -257,12 +348,79 @@ export default {
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id);
       this.studentIds = selection.map(item => item.studentId);
-      this.single = selection.length !== 1;
+      this.single = selection.length === 0;
       this.multiple = !selection.length;
     },
-    // 分配教师表单选择事件
-    handleSelectionChangeTeacher(selection) {
-      // this.teacherIds = selection.map(item => item.teacherId);
+    //保存学生-指导老师关系
+    distSave(){
+      if (this.studentIds.length > 0 && this.formTeacherId != null) {
+        let params = [];
+        this.studentIds.forEach(item => {
+          params.push({
+            studentId: item,
+            teacherId: this.formTeacherId
+          });
+        });
+        if (this.formType === "add"){
+          addDist(params).then(response => {
+            this.$message({
+              message: "分配成功",
+              type: "success"
+            });
+            this.open = false;
+            this.getList();
+          });
+        }else if (this.formType === "edit"){
+          updateDist(params).then(response => {
+            this.$message({
+              message: "分配成功",
+              type: "success"
+            });
+            this.open = false;
+            this.getList();
+          });
+        }
+
+
+      }
+    },
+    // 弹出表单表格行选择事件
+    handleCurrentChangeTeacher(row) {
+      this.formTeacherId = (row != null && row.userId != null) ? row.userId: null;
+    },
+    // 弹出表单表格保存按钮
+    handleTeacherSave() {
+      if (this.formTeacherId == null){
+        this.$message({
+          message: "请选择教师",
+          type: "warning"
+        });
+        return;
+      }else {
+        this.distSave();
+      }
+    },
+    //弹出表单教师列表行双击事件
+    handleRowDblclickTeacher(row) {
+      this.formTeacherId = row.userId;
+      this.distSave();
+    },
+
+
+    //弹出表单角色下拉框change事件
+    formRoleChange(value) {
+      this.formQueryParams.roleId = value;
+      this.formHandleQuery();
+    },
+    //弹出表单表格数据获取
+    getTeacherList() {
+      this.loading = true;
+      listUser(this.formQueryParams).then(response => {
+          this.teacherList = response.rows;
+          this.formTotal = response.total;
+          this.loading = false;
+        }
+      );
     },
     /** 分配按钮操作 */
     handleAdd() {
@@ -293,32 +451,56 @@ export default {
       }
 
       // 未分配指导老师，弹出分配指导老师窗口
-      this.reset();
-      listUser({
+      // this.reset();
+
+      listRole({
         pageNum: 1,
         pageSize: 10,
-        userType: '02'
-
+        roleName: '指导老师'
       }).then(response => {
-        this.teacherList = response.data;
+        this.roleIdAndName = response.rows;
+        // 设置弹出表单角色下拉框默认值
+        this.formQueryParams.roleId = this.roleIdAndName[0].roleId;
+        this.formType = "add";
         this.open = true;
         this.title = "分配指导老师";
+        this.getFormDeptTree();
+        this.getTeacherList();
       });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
-      const studentId = row.studentId || this.ids;
-      getUser(studentId).then(response => {
-        this.form = response.data;
-        this.postOptions = response.posts;
-        this.roleOptions = response.roles;
-        this.$set(this.form, "postIds", response.postIds);
-        this.$set(this.form, "roleIds", response.roleIds);
-        this.open = true;
-        this.title = "修改指导老师";
-        this.form.password = "";
-      });
+      // 判断所选学生是否已分配指导老师
+      let flag = true;     //默认未分配指导老师
+      // 判断是否已分配指导老师
+      for (let i = 0; i < this.ids.length; i++) {
+        if (this.ids[i] == null) {
+          flag = false;
+          break;
+        }
+      }
+      if (!flag) {
+        this.$message({
+          message: "所选学生未分配指导老师，请先分配指导老师！",
+          type: "warning"
+        });
+        return;
+      }else{
+        listRole({
+          pageNum: 1,
+          pageSize: 10,
+          roleName: '指导老师'
+        }).then(response => {
+          this.roleIdAndName = response.rows;
+          // 设置弹出表单角色下拉框默认值
+          this.formQueryParams.roleId = this.roleIdAndName[0].roleId;
+          this.formType = "edit";
+          this.open = true;
+          this.title = "修改指导老师";
+          this.getFormDeptTree();
+          this.getTeacherList();
+        });
+      }
     },
     /** 提交按钮 */
     submitForm: function() {

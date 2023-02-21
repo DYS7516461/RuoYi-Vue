@@ -48,8 +48,8 @@
 
     <insert id="insertDist" parameterType="StuDist" useGeneratedKeys="true" keyProperty="id">
         insert into studist(
-        <if test="studentId != null and studentId != 0">studentId,</if>
-        <if test="teacherId != null and deptId != 0">teacherId</if>
+        <if test="studentId != null and studentId != ''">studentId,</if>
+        <if test="teacherId != null and teacherId != ''">teacherId</if>
         )values(
         <if test="studentId != null and studentId != ''">#{studentId},</if>
         <if test="teacherId != null and teacherId != ''">#{teacherId}</if>
@@ -57,10 +57,9 @@
     </insert>
 
     <update id="updateDist" parameterType="StuDist">
-        update studist set teacherId = #{teacherId} where studentId in
-        <foreach collection="array" item="studentId" open="(" separator="," close=")">
-            #{studentId}
-        </foreach>
+        <if test="studentId != null and studentId != '' and teacherId != null and teacherId != ''">
+        update studist set teacherId = #{teacherId} where studentId = #{studentId}
+        </if>
     </update>
 
     <delete id="deleteDistByIds" parameterType="Long">

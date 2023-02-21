@@ -30,7 +30,7 @@ public interface StuDistMapper {
      * @param dist 学生分配信息
      * @return 结果
      */
-    public int updateDist(StuDist[] dist);
+    public int updateDist(StuDist dist);
 
     /**
      * 删除学生分配
