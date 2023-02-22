@@ -2,29 +2,37 @@ package com.ruoyi.common.core.domain.entity;
 
 import com.ruoyi.common.core.domain.BaseEntity;
 
-public class topic extends BaseEntity {
+public class TopicTitle extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-
-    private String titleId;
 
     private String titleName;
 
     private String teacherId;
 
+    public SysUser getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(SysUser teacher) {
+        this.teacher = teacher;
+    }
+
+    private SysUser teacher;
+
     private String status;
 
     private String remark;
 
-    public topic() {
+    public TopicTitle() {
     }
 
-    public topic(Long id, String titleId, String titleName, String teacherId, String status, String remark) {
+    public TopicTitle(Long id, String titleName, String teacherId,SysUser teacher, String status, String remark) {
         this.id = id;
-        this.titleId = titleId;
         this.titleName = titleName;
         this.teacherId = teacherId;
+        this.teacher = teacher;
         this.status = status;
         this.remark = remark;
     }
@@ -35,14 +43,6 @@ public class topic extends BaseEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getTitleId() {
-        return titleId;
-    }
-
-    public void setTitleId(String titleId) {
-        this.titleId = titleId;
     }
 
     public String getTitleName() {
@@ -81,11 +81,12 @@ public class topic extends BaseEntity {
 
     @Override
     public String toString() {
-        return "topic [id=" + id +
-                ", titleId=" + titleId +
+        return "TopicTitle [id=" + id +
                 ", titleName=" + titleName +
                 ", teacherId=" + teacherId +
                 ", status=" + status +
-                ", remark=" + remark + "]";
+                ", remark=" + remark +
+                ", teacher=" + teacher +
+                "]";
     }
 }
