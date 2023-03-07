@@ -11,7 +11,9 @@
         <result column="teacher_id" property="teacherId"  />
         <result column="status" property="status"  />
         <result column="remark" property="remark"  />
-        <association column="teacher_id" property="teacher" javaType="SysUser" resultMap="SysUserResult" />
+        <result column="stuTopicId" property="stuTopicId"  />
+        <association property="teacher" column="teacher_id" javaType="SysUser" resultMap="SysUserResult" />
+        <association property="stuTopic" column="stuTopicId" javaType="StuTopic" resultMap="StuTopicResult" />
     </resultMap>
 
     <resultMap type="SysUser" id="SysUserResult">
@@ -20,12 +22,22 @@
         <result property="nickName"     column="nick_name"    />
     </resultMap>
 
+    <resultMap id="StuTopicResult" type="StuTopic">
+        <id column="id" property="id"  />
+        <result column="topic_id" property="topicId"  />
+        <result column="stu_id" property="stuId"  />
+        <result column="stuTopicStatus" property="status"  />
+        <result column="stuTopicRemark" property="remark"  />
+    </resultMap>
+
 
     <sql id="selectTopicTitleVo">
-        select t.id,t.title_name,t.teacher_id,t.status,t.remark,
-               teac.user_name,teac.user_id,teac.nick_name
+        select t.id,t.title_name,t.teacher_id,t.status,t.remark,t.stuTopicId,
+               teac.user_name,teac.user_id,teac.nick_name,
+                stut.status as stuTopicStatus,stut.remark as stuTopicRemark
         from topic t
                  LEFT JOIN sys_user teac ON teac.user_id = t.teacher_id
+                 LEFT JOIN stu_topic stut ON stut.title_id = t.id
     </sql>
 
     <select id="selectTopicTitleList" parameterType="TopicTitle" resultMap="TopicTitleResult">
@@ -35,6 +47,9 @@
             <if test="teacherId != null  and teacherId != ''"> and t.teacher_id = #{teacherId}</if>
             <if test="status != null  and status != ''"> and t.status = #{status}</if>
         </where>
+        <if test="orderByColumn != null and orderByColumn != ''">
+            order by ${orderByColumn} ${isAsc}
+        </if>
     </select>
 
     <select id="selectTopicTitleById" parameterType="Long" resultMap="TopicTitleResult">
@@ -65,6 +80,7 @@
             <if test="teacherId != null">teacher_id = #{teacherId},</if>
             <if test="status != null">status = #{status},</if>
             <if test="remark != null">remark = #{remark},</if>
+            <if test="stuTopicId != null">stuTopicId = #{stuTopicId},</if>
         </trim>
         where id = #{id}
     </update>

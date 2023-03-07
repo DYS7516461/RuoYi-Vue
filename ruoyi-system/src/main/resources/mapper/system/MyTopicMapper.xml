@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MyTopicMapper">
+
+    <resultMap type="MyTopic" id="MyTopicResult">
+        <result property="id"    column="my_topic_id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="titleId"    column="title_id"    />
+        <result property="fileType"    column="file_type"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="fileStatus"    column="file_status"    />
+        <result property="uploadType"    column="upload_type"    />
+    </resultMap>
+    
+
+    <resultMap type="TopicTitle" id="TopicTitleResult">
+        <result property="id"    column="title_id"    />
+        <result property="titleName"    column="title_name"    />
+    </resultMap>
+
+    <resultMap id="StudentReault" type="SysUser">
+        <id property="userId" column="user_id" />
+        <result property="userName" column="user_name" />
+        <result property="nickName" column="nick_name" />
+    </resultMap>
+    
+    <resultMap id="MyTopicListResult" type="StuTopic">
+        <id property="id"    column="id"    />
+        <result property="titleId"    column="title_id"    />
+        <result property="studentId"    column="student_id"    />
+        <association property="title" column="title_id" javaType="TopicTitle" resultMap="TopicTitleResult"/>
+        <association property="student" column="student_id" javaType="SysUser" resultMap="StudentReault"/>
+        <collection property="myTopics" column="student_id" javaType="java.util.List" resultMap="MyTopicResult" />
+    </resultMap>
+
+    <sql id="selectMyTopicVo">
+        SELECT
+            st.id,st.student_id,st.title_id,
+            stu.user_name,stu.nick_name,stu.user_id,
+            t.title_name,t.id as title_id,
+            mt.id as my_topic_id,mt.file_name,mt.file_path,mt.file_status,mt.file_type,mt.upload__type
+        FROM stu_topic st
+                 LEFT JOIN sys_user stu ON stu.user_id = st.student_id
+                 LEFT JOIN topic t ON t.id = st.title_id
+                 LEFT JOIN my_topic mt ON mt.student_id = st.student_id AND mt.title_id = st.title_id
+    </sql>
+
+    <select id="selectMyTopicList" parameterType="MyTopic" resultMap="MyTopicListResult">
+        <include refid="selectMyTopicVo"/>
+        <where>
+            1 = 1
+            <if test="titleId != null "> and st.title_id = #{titleId}</if>
+            <if test="studentId != null "> and st.student_id = #{studentId}</if>
+        </where>
+    </select>
+
+    <select id="selectMyTopicById" parameterType="Long" resultMap="MyTopicResult">
+        select
+            id as my_topic_id,student_id,title_id,file_name,file_path,file_status,file_type,upload__type
+        from
+            my_topic
+        where
+            id = #{id}
+    </select>
+
+    <insert id="insertMyTopic" parameterType="MyTopic" useGeneratedKeys="true" keyProperty="id">
+        insert into my_topic
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="titleId != null">title_id,</if>
+            <if test="studentId != null">student_id,</if>
+            <if test="fileType != null">file_type,</if>
+            <if test="fileName != null">file_name,</if>
+            <if test="filePath != null">file_path,</if>
+            <if test="fileStatus != null">file_status,</if>
+            <if test="uploadType != null">upload_type,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="titleId != null">#{titleId},</if>
+            <if test="studentId != null">#{studentId},</if>
+            <if test="fileType != null">#{fileType},</if>
+            <if test="fileName != null">#{fileName},</if>
+            <if test="filePath != null">#{filePath},</if>
+            <if test="fileStatus != null">#{fileStatus},</if>
+            <if test="uploadType != null">#{uploadType},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMyTopic" parameterType="MyTopic">
+        update my_topic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="titleId != null">title_id = #{titleId},</if>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="fileType != null">file_type = #{fileType},</if>
+            <if test="fileName != null">file_name = #{fileName},</if>
+            <if test="filePath != null">file_path = #{filePath},</if>
+            <if test="fileStatus != null">file_status = #{fileStatus},</if>
+            <if test="uploadType != null">upload__type = #{uploadType},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMyTopicById" parameterType="Long">
+        delete from my_topic where id = #{id}
+    </delete>
+
+    <delete id="deleteMyTopicByIds" parameterType="String">
+        delete from my_topic where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTopicTitleByIds" parameterType="String">
+        delete from topic where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTopicTitleById" parameterType="Long">
+        delete from topic where id = #{id}
+    </delete>
+
+    <insert id="batchTopicTitle">
+        insert into topic( id, title_name, teacher_id, status, remark) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.titleName}, #{item.teacherId}, #{item.status}, #{item.remark})
+        </foreach>
+    </insert>
+</mapper>

@@ -31,7 +31,7 @@ public class stuDistController extends BaseController {
     /**
      * 获取学生分配列表
      */
-    @PreAuthorize("@ss.hasPermi('topic:dist:list')")
+    @PreAuthorize("@ss.hasAnyPermi('topic:dist:list,topic:myTopic:list')")
     @GetMapping("/list")
     public TableDataInfo list(StuDist dist)
     {

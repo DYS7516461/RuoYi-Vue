@@ -15,9 +15,29 @@ public class StuDist extends BaseEntity {
 
     private String studentName;
 
+    public SysUser getStudent() {
+        return student;
+    }
+
+    public void setStudent(SysUser student) {
+        this.student = student;
+    }
+
+    private SysUser student;
+
     private Long teacherId;
 
     private String teacherName;
+
+    public SysUser getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(SysUser teacher) {
+        this.teacher = teacher;
+    }
+
+    private SysUser teacher;
 
     public StuDist() {
     }

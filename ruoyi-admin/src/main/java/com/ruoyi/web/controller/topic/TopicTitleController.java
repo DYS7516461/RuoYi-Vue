@@ -38,7 +38,7 @@ public class TopicTitleController extends BaseController
     /**
      * 查询题目列表
      */
-    @PreAuthorize("@ss.hasPermi('system:topic:list')")
+    @PreAuthorize("@ss.hasPermi('topic:title:list')")
     @GetMapping("/list")
     public TableDataInfo list(TopicTitle topicTitle)
     {
@@ -50,20 +50,20 @@ public class TopicTitleController extends BaseController
     /**
      * 导出题目列表
      */
-    @PreAuthorize("@ss.hasPermi('system:topic:export')")
+    @PreAuthorize("@ss.hasPermi('topic:title:export')")
     @Log(title = "题目", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, TopicTitle topicTitle)
     {
         List<TopicTitle> list = topicTitleService.selectTopicTitleList(topicTitle);
-        ExcelUtil<TopicTitle> util = new ExcelUtil<TopicTitle>(TopicTitle.class);
+        ExcelUtil<TopicTitle> util = new ExcelUtil<>(TopicTitle.class);
         util.exportExcel(response, list, "题目数据");
     }
 
     /**
      * 获取题目详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:topic:query')")
+    @PreAuthorize("@ss.hasPermi('topic:title:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -73,7 +73,7 @@ public class TopicTitleController extends BaseController
     /**
      * 新增题目
      */
-    @PreAuthorize("@ss.hasPermi('system:topic:add')")
+    @PreAuthorize("@ss.hasPermi('topic:title:add')")
     @Log(title = "题目", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody TopicTitle topicTitle)
@@ -84,7 +84,7 @@ public class TopicTitleController extends BaseController
     /**
      * 修改题目
      */
-    @PreAuthorize("@ss.hasPermi('system:topic:edit')")
+    @PreAuthorize("@ss.hasAnyPermi('topic:title:edit,topic:title:fail,topic:title:pass,topic:title:Apply,topic:title:approve,topic:title:reject')")
     @Log(title = "题目", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody TopicTitle topicTitle)
@@ -95,7 +95,7 @@ public class TopicTitleController extends BaseController
     /**
      * 删除题目
      */
-    @PreAuthorize("@ss.hasPermi('system:topic:remove')")
+    @PreAuthorize("@ss.hasPermi('topic:title:remove')")
     @Log(title = "题目", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

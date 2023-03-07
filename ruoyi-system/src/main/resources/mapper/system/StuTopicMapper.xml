@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StuTopicMapper">
+
+    <resultMap type="StuTopic" id="StuTopicResult">
+        <result property="id"    column="id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="titleId"    column="title_id"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectStuTopicVo">
+        select id, student_id, title_id, status, remark from stu_topic
+    </sql>
+
+    <select id="selectStuTopicList" parameterType="StuTopic" resultMap="StuTopicResult">
+        <include refid="selectStuTopicVo"/>
+        <where>
+            <if test="studentId != null  and studentId != ''"> and student_id = #{studentId}</if>
+            <if test="titleId != null  and titleId != ''"> and title_id = #{titleId}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectStuTopicById" parameterType="Long" resultMap="StuTopicResult">
+        <include refid="selectStuTopicVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertStuTopic" parameterType="StuTopic" useGeneratedKeys="true" keyProperty="id">
+        insert into stu_topic
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">student_id,</if>
+            <if test="titleId != null">title_id,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">#{studentId},</if>
+            <if test="titleId != null">#{titleId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <select id="selectLastInsertId" resultType="java.lang.Long">
+        select last_insert_id()
+    </select>
+
+    <update id="updateStuTopic" parameterType="StuTopic">
+        update stu_topic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="titleId != null">title_id = #{titleId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStuTopicById" parameterType="Long">
+        delete from stu_topic where id = #{id}
+    </delete>
+
+    <delete id="deleteStuTopicByIds" parameterType="String">
+        delete from stu_topic where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
