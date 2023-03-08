@@ -62,7 +62,7 @@
               icon="el-icon-plus"
               size="mini"
               @click="handleAdd"
-              v-hasPermi="['system:user:add']"
+              v-hasPermi="['topic:student:add']"
             >分配</el-button>
           </el-col>
           <el-col :span="1.5">
@@ -73,7 +73,7 @@
               size="mini"
               :disabled="single"
               @click="handleUpdate"
-              v-hasPermi="['system:user:edit']"
+              v-hasPermi="['topic:student:edit']"
             >修改</el-button>
           </el-col>
           <el-col :span="1.5">
@@ -84,7 +84,7 @@
               size="mini"
               :disabled="multiple"
               @click="handleDelete"
-              v-hasPermi="['system:user:remove']"
+              v-hasPermi="['topic:student:remove']"
             >删除</el-button>
           </el-col>
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
@@ -96,8 +96,10 @@
           <el-table-column label="部门" align="center" key="deptName" prop="deptName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
           <el-table-column label="学生编号" align="center" key="studentId" prop="studentId" v-if="columns[2].visible" :show-overflow-tooltip="true"/>
           <el-table-column label="学生名称" align="center" key="studentName" prop="studentName" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="教师编号" align="center" key="teacherId" prop="teacherId" v-if="columns[4].visible" :show-overflow-tooltip="true" />
-          <el-table-column label="指导老师" align="center" key="teacherName" prop="teacherName" v-if="columns[5].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="学生名称" align="center" key="student.nickName" prop="student.nickName" v-if="columns[4].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="教师编号" align="center" key="teacherId" prop="teacherId" v-if="columns[5].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="指导老师" align="center" key="teacherName" prop="teacherName" v-if="columns[6].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="指导老师" align="center" key="teacher.nickName" prop="teacher.nickName" v-if="columns[7].visible" :show-overflow-tooltip="true" />
         </el-table>
 
         <pagination
@@ -258,8 +260,10 @@ export default {
         { key: 0, label: `ID`, visible: false },
         { key: 1, label: `部门`, visible: true },
         { key: 2, label: `学生编号`, visible: true },
+        { key: 3, label: `学生名称`, visible: false },
         { key: 3, label: `学生名称`, visible: true },
         { key: 4, label: `教师编号`, visible: true },
+        { key: 5, label: `教师名称`, visible: false },
         { key: 5, label: `教师名称`, visible: true }
       ],
       // 表单校验

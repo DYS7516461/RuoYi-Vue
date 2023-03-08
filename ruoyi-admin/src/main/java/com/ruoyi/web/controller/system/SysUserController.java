@@ -57,7 +57,7 @@ public class SysUserController extends BaseController
     /**
      * 获取用户列表
      */
-    @PreAuthorize("@ss.hasPermi('system:user:list')")
+    @PreAuthorize("@ss.hasAnyPermi('system:user:list,topic:student:add,topic:student:edit')")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user)
     {
@@ -247,7 +247,7 @@ public class SysUserController extends BaseController
     /**
      * 获取部门树列表
      */
-    @PreAuthorize("@ss.hasPermi('system:user:list')")
+    @PreAuthorize("@ss.hasAnyPermi('system:user:list,topic:student:list')")
     @GetMapping("/deptTree")
     public AjaxResult deptTree(SysDept dept)
     {

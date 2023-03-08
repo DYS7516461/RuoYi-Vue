@@ -371,7 +371,7 @@ export default {
     init(){
       let roles = this.$store.state.user.roles;
       console.log(roles)
-      if(roles.indexOf("admin") > -1){
+      if(roles.indexOf("admin") > -1 || roles.indexOf("GraduationLeader") > -1){
         //table表格列显示控制
         this.tableColumn.stuTopicStatus = false;
         this.tableColumn.stuTopicRemark = false;

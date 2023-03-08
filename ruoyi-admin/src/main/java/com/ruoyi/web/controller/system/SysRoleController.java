@@ -56,7 +56,7 @@ public class SysRoleController extends BaseController
     @Autowired
     private ISysDeptService deptService;
 
-    @PreAuthorize("@ss.hasPermi('system:role:list')")
+    @PreAuthorize("@ss.hasAnyPermi('system:role:list,topic:student:add,topic:student:edit')")
     @GetMapping("/list")
     public TableDataInfo list(SysRole role)
     {

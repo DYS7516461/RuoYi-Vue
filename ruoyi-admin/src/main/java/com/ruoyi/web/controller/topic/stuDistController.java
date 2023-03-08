@@ -31,7 +31,7 @@ public class stuDistController extends BaseController {
     /**
      * 获取学生分配列表
      */
-    @PreAuthorize("@ss.hasAnyPermi('topic:dist:list,topic:myTopic:list')")
+    @PreAuthorize("@ss.hasAnyPermi('topic:dist:list,topic:myTopic:list,topic:student:list')")
     @GetMapping("/list")
     public TableDataInfo list(StuDist dist)
     {
@@ -43,7 +43,7 @@ public class stuDistController extends BaseController {
     /**
      * 新增学生分配关系
      */
-    @PreAuthorize("@ss.hasPermi('topic:dist:add')")
+    @PreAuthorize("@ss.hasAnyPermi('topic:dist:add,topic:student:add')")
     @Log(title = "学生分配", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody StuDist[] dists)
@@ -54,7 +54,7 @@ public class stuDistController extends BaseController {
     /**
      * 修改学生分配关系
      */
-    @PreAuthorize("@ss.hasPermi('topic:dist:edit')")
+    @PreAuthorize("@ss.hasAnyPermi('topic:dist:edit,topic:student:edit')")
     @Log(title = "学生分配", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody StuDist[] dists)
@@ -65,7 +65,7 @@ public class stuDistController extends BaseController {
     /**
      * 删除学生分配关系
      */
-    @PreAuthorize("@ss.hasPermi('topic:dist:remove')")
+    @PreAuthorize("@ss.hasAnyPermi('topic:dist:remove,topic:student:remove')")
     @Log(title = "学生分配", businessType = BusinessType.DELETE)
     @DeleteMapping("/{distIds}")
     public AjaxResult remove(@PathVariable Long[] distIds)
@@ -76,7 +76,7 @@ public class stuDistController extends BaseController {
     /**
      * 获取部门树列表
      */
-    @PreAuthorize("@ss.hasPermi('topic:dist:list')")
+    @PreAuthorize("@ss.hasAnyPermi('topic:dist:list,topic:student:list')")
     @GetMapping("/deptTree")
     public AjaxResult deptTree(SysDept dept)
     {
