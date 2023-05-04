@@ -225,7 +225,7 @@
           <el-input v-model="form.teacherId" placeholder="请输入教师ID" />
         </el-form-item>
         <el-form-item label="教师名称" prop="teacher.nickName">
-          <el-input v-model="form.teacher.nickName" placeholder="请输入教师名称" @focus="openTeacherList"/>
+          <el-input v-model="form.teacher.nickName" placeholder="请输入教师名称" @focus="openTeacherList" :disabled="!isTeacher"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -297,6 +297,8 @@ export default {
       open: false,
       //是否显示教师弹出层
       teacherListOpen: false,
+      //当前用户是否是教师
+      isTeacher: false,
       //弹出层表单类型
       formType: "",
       // 查询参数
@@ -511,6 +513,9 @@ export default {
     },
     //打开教师列表弹窗
     openTeacherList(){
+      if (this.isTeacher){
+        return;
+      }
       listRole({
         pageNum: 1,
         pageSize: 10,
@@ -537,6 +542,13 @@ export default {
       this.form.status = "0";
       this.open = true;
       this.title = "添加选题";
+
+      //如果当前用户是老师
+      if(this.user.userType === '02'){
+        this.form.teacherId = this.user.userId;
+        this.form.teacher.nickName = this.user.nickName;
+        this.isTeacher = true;
+      }
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -654,6 +666,7 @@ export default {
     },
     /** 批准按钮操作 */
     handleApprove(row) {
+      console.log(row.remark)
       if (row.status !== '1'){
         this.$message({
           message: "该选题还未通过审核，请先审核！",
@@ -670,7 +683,7 @@ export default {
       updateTopic({
         id: row.stuTopicId,
         status: "1",
-        remark: "学生"+this.user.nickName+"申请选题《"+row.titleName+"》已批准"
+        remark: "教师 "+this.user.nickName+" 已批准 "+row.stuTopic.remark
       }).then(response => {
         this.$modal.msgSuccess("批准成功");
         this.open = false;
@@ -695,7 +708,7 @@ export default {
       updateTopic({
         id: row.stuTopicId,
         status: "2",
-        remark: "学生"+this.user.nickName+"申请选题《"+row.titleName+"》已拒绝"
+        remark: "教师 "+this.user.nickName+" 已拒绝 "+row.stuTopic.remark
       }).then(response => {
         this.$modal.msgSuccess("拒绝成功");
         this.open = false;
