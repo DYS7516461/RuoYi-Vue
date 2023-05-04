@@ -225,7 +225,7 @@
           <el-input v-model="form.teacherId" placeholder="请输入教师ID" />
         </el-form-item>
         <el-form-item label="教师名称" prop="teacher.nickName">
-          <el-input v-model="form.teacher.nickName" placeholder="请输入教师名称" @focus="openTeacherList" :disabled="!isTeacher"/>
+          <el-input v-model="form.teacher.nickName" placeholder="请输入教师名称" @focus="openTeacherList" :disabled="isTeacher"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
