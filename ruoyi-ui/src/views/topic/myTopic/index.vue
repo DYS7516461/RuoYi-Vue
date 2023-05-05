@@ -505,7 +505,7 @@ export default {
       this.$alert("<div style='overflow: auto;overflow-x: hidden;max-height: 70vh;padding: 10px 20px 0;'>" + response.msg + "</div>", "导入结果", { dangerouslyUseHTMLString: true });
       this.getList();
       //更新附件状态
-      if (this.upload.fileStatus === '0') {
+      if (this.upload.fileStatus === '0' || this.upload.fileStatus === null || this.upload.fileStatus === '') {
         //未上传改为已上传
         this.upload.fileStatus = '1';
       }else if(this.upload.fileStatus === '2'){
@@ -529,6 +529,9 @@ export default {
     /** 下载按钮操作 */
     handleDownload(row) {
       console.log(row)
+      if (row.fileStatus === '0' || row.fileStatus === null || row.fileStatus === '') {
+        this.$modal.msgWarning("该附件未上传，不可下载");
+      }
       this.download('topic/mytopic/download',
         {
           id: row.id,
@@ -538,13 +541,13 @@ export default {
         row.fileName + row.filePath.substring(row.filePath.lastIndexOf(".")));
         //更新附件状态
         if (row.fileStatus === '1') {
-          //未上传改为已上传
+          //已上传 改为 已查看待批改
           row.fileStatus = '2';
         }else if(row.fileStatus === '3'){
-          //已查看待批改 改为 已批改待更正
+          // 已批改待更正 改为 已查看待更正
           row.fileStatus = '4';
         }else if(row.fileStatus === '5'){
-          //已查看待更正 改为 已更正待查看
+          // 已更正待查看 改为 已查看待批改
           row.fileStatus = '2';
         }
         updateTopic({

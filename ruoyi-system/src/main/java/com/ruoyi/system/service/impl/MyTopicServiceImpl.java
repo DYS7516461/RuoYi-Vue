@@ -74,8 +74,8 @@ public class MyTopicServiceImpl implements IMyTopicService
     @Override
     public int updateMyTopic(MyTopic myTopic)
     {
-        myTopicMapper.deleteTopicTitleById(myTopic.getId());
-        insertTopicTitle(myTopic);
+//        myTopicMapper.deleteTopicTitleById(myTopic.getId());
+//        insertTopicTitle(myTopic);
         return myTopicMapper.updateMyTopic(myTopic);
     }
 
