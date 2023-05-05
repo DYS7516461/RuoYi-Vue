@@ -1,6 +1,14 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="教师ID" prop="id" v-show="queryForm.teacherId">
+        <el-input
+          v-model="queryParams.teacherId"
+          placeholder="教师ID"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="选题名称" prop="titleName" v-if="queryForm.titleName">
         <el-input
           v-model="queryParams.titleName"
@@ -240,7 +248,7 @@
 
 <script>
 import { listTitle, getTitle, delTitle, addTitle, updateTitle } from "@/api/topic/title";
-import {deptTreeSelect} from "@/api/topic/stuDist";
+import {listDist, deptTreeSelect} from "@/api/topic/stuDist";
 import {listTopic, addTopic, updateTopic} from "@/api/topic/stuTopic";
 import {listUser} from "@/api/system/user";
 import {listRole} from "@/api/system/role";
@@ -287,6 +295,7 @@ export default {
       },
       //查询表单显示控制
       queryForm: {
+        teacherId: false,
         titleName: true,
         teacher: true,
         status: true
@@ -308,6 +317,7 @@ export default {
         orderByColumn: "status",
         isAsc: "asc",
         titleName: undefined,
+        teacherId: undefined,
         teacher:{
           userName: undefined,
           nickName: undefined
@@ -361,17 +371,50 @@ export default {
   },
   created() {
     this.init();
-    this.getList();
     //获取当前用户信息
     getInfo().then(response => {
       //初始化当前用户
       this.user = response["user"]
+
+      //判断当前用户是否是教师
+      if(this.user.userType === "02"){
+        this.isTeacher = true;
+        // this.queryForm.teacher = false;
+        this.queryParams.teacherId = this.user.userId;
+
+        //刷新列表
+        this.getList();
+      }else if(this.user.userType === "01"){
+        //当前用户为学生，查询该学生所属教师，并设置教师ID为查询条件
+        // this.queryForm.teacherId = false;
+
+        //查询当前学生所属教师
+        listDist({studentId: this.user.userId}).then(response => {
+          this.queryParams.teacherId = response["data"]["teacherId"];
+          // 刷新列表
+          this.getList();
+        }).catch(error => {
+          console.log(error);
+          //刷新列表
+          this.getList();
+        });
+
+      }else {
+        //刷新列表
+        this.getList();
+      }
+    }).catch(error => {
+      console.log(error);
+      //刷新列表
+      this.getList();
     });
+
   },
   methods: {
     /** 初始化 */
     init(){
       let roles = this.$store.state.user.roles;
+      console.log(this.$store)
       console.log(roles)
       if(roles.indexOf("admin") > -1 || roles.indexOf("GraduationLeader") > -1){
         //table表格列显示控制
