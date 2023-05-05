@@ -390,7 +390,17 @@ export default {
 
         //查询当前学生所属教师
         listDist({studentId: this.user.userId}).then(response => {
-          this.queryParams.teacherId = response["data"]["teacherId"];
+          let list = response["rows"];
+          if (list != null && list.length > 0) {
+            this.queryParams.teacherId = list[0].teacherId;
+          }else {
+            //未查询到所属教师
+            this.queryParams.teacherId = 0;
+            this.$message({
+              message: "未分配指导老师！",
+              type: "warning"
+            });
+          }
           // 刷新列表
           this.getList();
         }).catch(error => {
