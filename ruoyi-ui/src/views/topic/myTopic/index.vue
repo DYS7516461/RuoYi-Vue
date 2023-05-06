@@ -97,21 +97,21 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
+            icon="el-icon-upload"
             @click="handleUpload(scope.row)"
             v-hasPermi="['topic:myTopic:upload']"
           >上传</el-button>
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-delete"
+            icon="el-icon-download"
             @click="handleDownload(scope.row)"
             v-hasPermi="['topic:myTopic:download']"
           >下载</el-button>
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-delete"
+            icon="el-icon-folder-checked"
             @click="handleArchive(scope.row)"
             v-hasPermi="['topic:myTopic:archive']"
           >归档</el-button>
