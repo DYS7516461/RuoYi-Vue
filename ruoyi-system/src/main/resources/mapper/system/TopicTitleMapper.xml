@@ -43,6 +43,7 @@
     <select id="selectTopicTitleList" parameterType="TopicTitle" resultMap="TopicTitleResult">
         <include refid="selectTopicTitleVo"/>
         <where>
+            <if test="id != null  and id != ''"> and t.id = #{id} </if>
             <if test="titleName != null  and titleName != ''"> and t.title_name like concat('%', #{titleName}, '%')</if>
             <if test="teacherId != null  and teacherId != ''"> and t.teacher_id = #{teacherId}</if>
             <if test="status != null  and status != ''"> and t.status = #{status}</if>

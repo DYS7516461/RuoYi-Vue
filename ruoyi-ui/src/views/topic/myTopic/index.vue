@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="学生姓名" prop="studentId" >
-        <el-select v-model="queryParams.studentId" placeholder="学生姓名" clearable >
+        <el-select v-model="queryParams.studentId" placeholder="学生姓名" @change="setTitleByStudent">
           <el-option
             v-for="student in this.studentSelect"
             :key="student.value"
@@ -11,8 +11,8 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="选题id" prop="titleId">
-        <el-select v-model="queryParams.titleId" placeholder="选题id" clearable >
+      <el-form-item label="选题" prop="titleId">
+        <el-select v-model="queryParams.titleId" placeholder="选题" @change="setStudentByTitle">
           <el-option
             v-for="title in this.titleSelect"
             :key="title.value"
@@ -281,13 +281,16 @@ export default {
           if (response.rows.length === 0) {
             this.$message.error("当前教师未分配学生，请联系上级领导！");
             return;
+          }else{
+            //将第一个学生设置为默认选中值
+            this.studentSelect = response.rows.map(item => {
+              return {
+                value: item.studentId,
+                label: item.student.nickName
+              };
+            });
+            this.queryParams.studentId = response.rows[0]['studentId']
           }
-          this.studentSelect = response.rows.map(item => {
-            return {
-              value: item.studentId,
-              label: item.student.nickName
-            };
-          });
           //初始化题目下拉框
           getInfo().then(response => {
             //初始化当前用户
@@ -300,14 +303,20 @@ export default {
               if (response.rows.length === 0) {
                 this.$message.error("当前教师无毕设题目，请先申请题目！");
                 return;
+              }else{
+                this.titleSelect = response.rows.map(item => {
+                  return {
+                    value: item.id,
+                    label: item.titleName
+                  };
+                });
+                // this.queryParams.titleId = '60';
+                this.setTitleByStudent();
               }
-              this.titleSelect = response.rows.map(item => {
-                return {
-                  value: item.id,
-                  label: item.titleName
-                };
-              });
-              this.handleQuery();
+              // if (this.queryParams.studentId != null && this.queryParams.titleId != null){
+                // 当学生和选题筛选框均不为空时，刷新列表
+                this.handleQuery();
+              // }
             });
           });
 
@@ -390,6 +399,51 @@ export default {
       this.topicTitleList = [];
       this.resetForm("form");
     },
+    /**
+     * 搜索条件表单-根据已选择的学生设置选题
+     */
+    setTitleByStudent(){
+      let stuId = this.queryParams.studentId;
+      if (stuId != null && stuId != ""){
+        listStuTopic({
+          pageNum: 1,
+          pageSize: 1000,
+          studentId: stuId,
+          status: 1
+        }).then(response => {
+          if (response.rows != null && response.rows.length > 0 && response.rows[0]['titleId'] != null){
+            this.queryParams.titleId = parseInt(response.rows[0]['titleId']);
+          }else{
+            this.$message.error("当前学生未选题！");
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+    },
+    /**
+     * 搜索条件表单-根据已选择的选题设置学生
+     */
+    setStudentByTitle(){
+      let titleId = this.queryParams.titleId;
+      if (titleId != null && titleId != ""){
+        listStuTopic({
+          pageNum: 1,
+          pageSize: 1000,
+          titleId: titleId,
+          status: 1
+        }).then(response => {
+          if (response.rows != null && response.rows.length > 0 && response.rows[0]['studentId'] != null){
+            this.queryParams.studentId = parseInt(response.rows[0]['studentId']);
+          }else{
+            this.$message.error("当前选题无学生选择！");
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+    },
+
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -397,7 +451,9 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.resetForm("queryForm");
+      // this.resetForm("queryForm");
+      this.queryParams.studentId = this.studentSelect[0].value;
+      this.setTitleByStudent();
       this.handleQuery();
     },
     // 多选框选中数据

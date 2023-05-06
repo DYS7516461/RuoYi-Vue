@@ -91,13 +91,13 @@
     <update id="updateMyTopic" parameterType="MyTopic">
         update my_topic
         <trim prefix="SET" suffixOverrides=",">
-            <if test="titleId != null">title_id = #{titleId},</if>
-            <if test="studentId != null">student_id = #{studentId},</if>
-            <if test="fileType != null">file_type = #{fileType},</if>
-            <if test="fileName != null">file_name = #{fileName},</if>
-            <if test="filePath != null">file_path = #{filePath},</if>
-            <if test="fileStatus != null">file_status = #{fileStatus},</if>
-            <if test="uploadType != null">upload__type = #{uploadType},</if>
+            <if test="titleId != null">title_id = #{titleId}</if>
+            <if test="studentId != null">student_id = #{studentId}</if>
+            <if test="fileType != null">file_type = #{fileType}</if>
+            <if test="fileName != null">file_name = #{fileName}</if>
+            <if test="filePath != null">file_path = #{filePath}</if>
+            <if test="fileStatus != null">file_status = #{fileStatus}</if>
+            <if test="uploadType != null">upload__type = #{uploadType}</if>
         </trim>
         where id = #{id}
     </update>
